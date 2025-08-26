@@ -1,0 +1,3 @@
+export default {
+  getCategories() { return [{ id:1, name:'Electronics' }, { id:2, name:'Books' }]; }
+};
