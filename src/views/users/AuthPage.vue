@@ -1,202 +1,221 @@
 <template>
-  <div class="auth-wrapper">
-    <div class="auth-box">
-      <h1 class="logo">Formul<span class="accent">é</span></h1>
+  <div class="auth-container">
+    <!-- Left Side Illustration -->
+    <div class="auth-illustration">
+      <div class="overlay-gradient"></div>
+      <h1 class="illustration-title">Formulé</h1>
+      <p class="illustration-tag">Elegance in Every Detail 🌿</p>
+    </div>
 
-      <div class="tabs">
-        <button :class="{ active: isLogin }" @click="isLogin = true">Login</button>
-        <button :class="{ active: !isLogin }" @click="isLogin = false">Register</button>
-      </div>
+    <!-- Right Side Form Card -->
+    <div class="auth-panel">
+      <div class="form-wrapper">
+        <h2 class="brand-title">{{ isLogin ? 'Welcome Back' : 'Create Your Account' }}</h2>
+        <p class="tagline">
+          {{ isLogin
+            ? 'Log in to access your personalized experience.'
+            : 'Join us and elevate your wellness journey.' }}
+        </p>
 
-      <form @submit.prevent="handleSubmit" class="auth-form">
-        <div class="form-group">
-          <label>Email</label>
-          <input v-model="form.email" type="email" required />
+        <!-- Tabs -->
+        <div class="tabs">
+          <button :class="{ active: isLogin }" @click="isLogin = true">Login</button>
+          <button :class="{ active: !isLogin }" @click="isLogin = false">Register</button>
         </div>
 
-        <div class="form-group">
-          <label>Password</label>
-          <input v-model="form.password" type="password" required />
-        </div>
+        <!-- Form -->
+        <form @submit.prevent="handleSubmit" class="auth-form">
+          <!-- Only show registration fields when registering -->
+          <template v-if="!isLogin">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input id="firstName" v-model="form.firstName" type="text" required />
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input id="lastName" v-model="form.lastName" type="text" required />
+            </div>
+            <div class="form-group">
+              <label for="phoneNumber">Phone Number</label>
+              <input id="phoneNumber" v-model="form.phoneNumber" type="tel" required />
+            </div>
+          </template>
 
-        <template v-if="!isLogin">
           <div class="form-group">
-            <label>Full Name</label>
-            <input v-model="form.fullName" type="text" required />
+            <label for="emailAddress">Email Address</label>
+            <input id="emailAddress" v-model="form.emailAddress" type="email" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" v-model="form.password" type="password" required />
           </div>
 
-          <div class="form-group">
-            <label>Role</label>
-            <select v-model="form.role" required>
-              <option disabled value="">Select role</option>
-              <option value="customer">Customer</option>
-              <option value="admin">Admin</option>
-            </select>
+          <button type="submit" class="submit-btn">{{ isLogin ? 'Login' : 'Register' }}</button>
+        </form>
+
+        <!-- Success / Error Toast -->
+        <transition name="fade">
+          <div v-if="submitted" class="success-toast" aria-live="polite">
+            {{ successMessage }}
           </div>
-        </template>
-
-        <button type="submit" class="submit-btn">{{ isLogin ? 'Login' : 'Register' }}</button>
-      </form>
-
-      <div v-if="submitted" class="success-msg">
-        {{ isLogin ? 'Welcome back to Formulé ✨' : `Thank you for joining, ${form.role === 'admin' ? 'Admin' : 'Beautiful You'}!` }}
+        </transition>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive } from 'vue';
+import { useRouter } from 'vue-router';
+import customerAPI from '@/api/users/customerService.js';
 
-const isLogin = ref(true)
-const submitted = ref(false)
-const router = useRouter()
+const isLogin = ref(true);
+const submitted = ref(false);
+const successMessage = ref('');
+const router = useRouter();
 
 const form = reactive({
-  email: '',
-  password: '',
-  fullName: '',
-  role: ''
-})
+  firstName: '',
+  lastName: '',
+  phoneNumber: '',
+  emailAddress: '',
+  password: ''
+});
 
-const handleSubmit = () => {
-  submitted.value = true
+const handleSubmit = async () => {
+  submitted.value = false;
+  successMessage.value = '';
 
-  const userData = {
-    email: form.email,
-    role: isLogin.value ? 'customer' : form.role
-  }
-
-  localStorage.setItem('user', JSON.stringify(userData))
-
-  setTimeout(() => {
-    if (userData.role === 'admin') {
-      router.push('/admin')
+  try {
+    if (isLogin.value) {
+      // Login: currently local only
+      const userData = { emailAddress: form.emailAddress, password: form.password };
+      localStorage.setItem('user', JSON.stringify(userData));
+      successMessage.value = 'Welcome back!';
+      submitted.value = true;
+      setTimeout(() => router.push('/'), 1200);
     } else {
-      router.push('/')
+      // Registration
+      const customerData = {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        phoneNumber: form.phoneNumber,
+        emailAddress: form.emailAddress,
+        password: form.password
+      };
+
+      const newCustomer = await customerAPI.create(customerData);
+      successMessage.value = `Thank you for joining, ${newCustomer.firstName}!`;
+      submitted.value = true;
+
+      setTimeout(() => router.push('/'), 1200);
     }
-  }, 1000)
-}
+  } catch (error) {
+    console.error("Error occurred during registration:", error.response ? error.response.data : error);
+    successMessage.value = `An error occurred: ${error.response ? error.response.data : error.message}`;
+    submitted.value = true;
+  }
+};
 </script>
 
+
 <style scoped>
-/* Brand colors */
 :root {
   --cream: #F0EAD2;
   --mint: #DDE5B6;
   --olive: #ADC178;
   --taupe: #A98467;
-  --espresso: #6C584C;
+  --black: #000000;
 }
 
-.auth-wrapper {
+.auth-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
+  background: var(--cream);
+}
+
+.auth-illustration {
+  position: relative;
+  background: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1400&q=80') center/cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  color: var(--black);
+}
+.overlay-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(173,193,120,0.3));
+}
+.illustration-title { font-size: 3rem; font-weight: 900; color: var(--black); margin:0; }
+.illustration-tag { font-size: 1rem; color: var(--black); margin-top:0.5rem; }
+
+.auth-panel {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-color: var(--cream);
-  font-family: 'Segoe UI', sans-serif;
+  padding: 0;
 }
 
-.auth-box {
-  background-color: white;
-  padding: 2.5rem 2rem;
+.form-wrapper {
   width: 100%;
-  max-width: 420px;
-  border-radius: 18px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  border: 2px solid var(--mint);
-  text-align: center;
-}
-
-.logo {
-  font-size: 2.2rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
-  color: var(--espresso);
-  letter-spacing: 1px;
-}
-
-.logo .accent {
-  color: var(--olive);
-  font-style: italic;
-}
-
-.tabs {
+  max-width: 440px;
+  background: white;
+  padding: 1.5rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
+  flex-direction: column;
 }
 
-.tabs button {
-  flex: 1;
-  padding: 0.7rem;
-  font-size: 1rem;
-  border: none;
-  background-color: var(--mint);
-  color: var(--espresso);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
-}
+.brand-title { font-size: 1.8rem; font-weight:700; margin-bottom:0.2rem; color: var(--black); }
+.tagline { font-size:0.9rem; margin-bottom:1rem; color: var(--black); }
 
-.tabs button.active {
-  background-color: var(--olive);
-  color: white;
-}
+.tabs { display: flex; margin-bottom:1rem; border-radius:10px; overflow:hidden; }
+.tabs button { flex:1; padding:0.5rem; font-size:0.85rem; border:none; background:#fafafa; cursor:pointer; transition: all 0.3s; }
+.tabs button.active { background: var(--olive); color:white; }
 
-.auth-form {
-  text-align: left;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.3rem;
-  font-weight: 600;
-  color: var(--espresso);
-}
-
-input,
-select {
-  width: 100%;
-  padding: 0.65rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background-color: #fafafa;
-}
-
-input:focus,
-select:focus {
-  outline: none;
-  border-color: var(--olive);
-  background-color: white;
-}
+.form-group { margin-bottom:0.7rem; display:flex; flex-direction:column; }
+label { font-size:0.8rem; margin-bottom:0.2rem; }
+input, select { padding:0.6rem; font-size:0.85rem; border-radius:6px; border:1px solid #ddd; }
 
 .submit-btn {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: var(--olive);
-  border: none;
-  color: white;
-  font-size: 1rem;
-  border-radius: 8px;
-  margin-top: 1rem;
-  cursor: pointer;
-  transition: background 0.3s;
+  padding:0.8rem;
+  font-size:0.95rem;
+  border-radius:10px;
+  border:none;
+  background: var(--olive);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  transition: all 0.3s;
+}
+.submit-btn:hover { background: var(--taupe); transform: translateY(-1px); }
+
+.success-toast {
+  position: fixed;
+  bottom:1rem;
+  right:1rem;
+  padding:0.6rem 1.2rem;
+  border-radius:10px;
+  background: var(--mint);
+  color: var(--black);
+  font-weight:600;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
 }
 
-.submit-btn:hover {
-  background-color: #94a662;
-}
+.fade-enter-active, .fade-leave-active { transition: opacity 0.5s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 
-.success-msg {
-  margin-top: 1.5rem;
-  font-weight: 600;
-  color: var(--taupe);
+@media (max-width: 900px) {
+  .auth-container { grid-template-columns: 1fr; }
+  .auth-illustration { display:none; }
+  .auth-panel { padding:0; }
+  .form-wrapper { padding:1rem; }
 }
 </style>

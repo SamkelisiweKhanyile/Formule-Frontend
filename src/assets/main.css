@@ -1,5 +1,6 @@
 @import './base.css';
 
+/* 🌿 Brand palette */
 :root {
   --cream: #F0EAD2;
   --mint: #DDE5B6;
@@ -8,12 +9,19 @@
   --espresso: #6C584C;
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+html, body, #app {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
+
+#app {
+  max-width: none;
+  font-weight: normal;
+  display: block;
+}
+
 
 a,
 .green {
@@ -31,13 +39,13 @@ a,
 
 @media (min-width: 1024px) {
   body {
-    display: flex;
-    place-items: center;
+    display: block;
+    place-items: unset;
   }
 
   #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+    display: block;
+    grid-template-columns: none;
+    padding: 0;
   }
 }
