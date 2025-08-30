@@ -1,5 +1,13 @@
 @import './base.css';
 
+:root {
+  --cream: #F0EAD2;
+  --mint: #DDE5B6;
+  --olive: #ADC178;
+  --taupe: #A98467;
+  --espresso: #6C584C;
+}
+
 #app {
   max-width: 1280px;
   margin: 0 auto;
