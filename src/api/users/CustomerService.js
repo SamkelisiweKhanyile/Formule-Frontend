@@ -38,7 +38,7 @@ const customerAPI = {
 
   update: async (id, customerData) => {
     try {
-      const response = await axios.put(`${apiUrl}/update`, customerData); // backend expects body only
+      const response = await axios.put(`${apiUrl}/update`, customerData); 
       return response.data;  
     } catch (error) {
       console.error("Error updating customer:", error.response ? error.response.data : error.message);
