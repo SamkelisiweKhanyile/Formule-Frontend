@@ -4,6 +4,7 @@ import ProductList from '@/views/business/ProductList.vue'
 import Checkout from '@/views/business/Checkout.vue'
 import AuthPage from '@/views/users/AuthPage.vue'
 
+
 // Admin
 import AdminDashboard from '@/views/users/admin/AdminDashboard.vue'
 
@@ -36,11 +37,6 @@ router.beforeEach((to, from, next) => {
   }
 
 
-  if (to.name === 'Checkout') {
-    if (!user) {
-      return next({ name: 'Auth' })
-    }
-  }
 
   next() 
 })
