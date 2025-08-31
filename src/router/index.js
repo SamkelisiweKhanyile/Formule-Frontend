@@ -10,6 +10,7 @@ import AdminDashboard from '@/views/users/admin/AdminDashboard.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: ProductList },
+  {path: '/',name: 'products',component: ProductList},
   { path: '/checkout', name: 'Checkout', component: Checkout },
   { path: '/auth', name: 'Auth', component: AuthPage },
   { path: '/admin', name: 'AdminDashboard', component: AdminDashboard },
