@@ -27,7 +27,7 @@ const customerAPI = {
 
   getById: async (id) => {
     try {
-      const response = await axios.get(`${apiUrl}/get/${id}`);
+      const response = await axios.get(`${apiUrl}/read/${id}`);
       return response.data; 
     } catch (error) {
       console.error("Error fetching customer by ID:", error.response ? error.response.data : error.message);
@@ -38,13 +38,14 @@ const customerAPI = {
 
   update: async (id, customerData) => {
     try {
-      const response = await axios.put(`${apiUrl}/update/${id}`, customerData);
+      const response = await axios.put(`${apiUrl}/update`, customerData); // backend expects body only
       return response.data;  
     } catch (error) {
       console.error("Error updating customer:", error.response ? error.response.data : error.message);
       throw error;
     }
   },
+
 
   delete: async (id) => {
     try {
@@ -55,6 +56,8 @@ const customerAPI = {
       throw error;
     }
   }
+
+  
 };
 
 export default customerAPI;

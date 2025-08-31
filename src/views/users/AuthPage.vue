@@ -1,13 +1,13 @@
 <template>
   <div class="auth-container">
-    <!-- Left Side Illustration -->
+    <!-- Left Illustration -->
     <div class="auth-illustration">
       <div class="overlay-gradient"></div>
       <h1 class="illustration-title">Formulé</h1>
       <p class="illustration-tag">Elegance in Every Detail 🌿</p>
     </div>
 
-    <!-- Right Side Form Card -->
+    <!-- Right Form Panel -->
     <div class="auth-panel">
       <div class="form-wrapper">
         <h2 class="brand-title">{{ isLogin ? 'Welcome Back' : 'Create Your Account' }}</h2>
@@ -25,7 +25,7 @@
 
         <!-- Form -->
         <form @submit.prevent="handleSubmit" class="auth-form">
-          <!-- Only show registration fields when registering -->
+          <!-- Registration fields -->
           <template v-if="!isLogin">
             <div class="form-group">
               <label for="firstName">First Name</label>
@@ -53,7 +53,7 @@
           <button type="submit" class="submit-btn">{{ isLogin ? 'Login' : 'Register' }}</button>
         </form>
 
-        <!-- Success / Error Toast -->
+        <!-- Success/Error Toast -->
         <transition name="fade">
           <div v-if="submitted" class="success-toast" aria-live="polite">
             {{ successMessage }}
@@ -88,12 +88,25 @@ const handleSubmit = async () => {
 
   try {
     if (isLogin.value) {
-      // Login: currently local only
-      const userData = { emailAddress: form.emailAddress, password: form.password };
-      localStorage.setItem('user', JSON.stringify(userData));
-      successMessage.value = 'Welcome back!';
+      // Login
+      const users = await customerAPI.getAll();
+      console.log("Users returned from backend:", users);
+      const loggedInUser = users.find(
+        u => u.emailAddress === form.emailAddress && u.password === form.password
+      );
+
+      if (!loggedInUser) {1
+        successMessage.value = "Invalid email or password!";
+        submitted.value = true;
+        return;
+      }
+
+      localStorage.setItem('userId', loggedInUser.id);
+      successMessage.value = `Welcome back, ${loggedInUser.firstName}!`;
       submitted.value = true;
-      setTimeout(() => router.push('/'), 1200);
+
+      setTimeout(() => router.push('/customer/profile'), 1200);
+
     } else {
       // Registration
       const customerData = {
@@ -105,19 +118,20 @@ const handleSubmit = async () => {
       };
 
       const newCustomer = await customerAPI.create(customerData);
+      localStorage.setItem('userId', newCustomer.id);
+
       successMessage.value = `Thank you for joining, ${newCustomer.firstName}!`;
       submitted.value = true;
 
-      setTimeout(() => router.push('/'), 1200);
+      setTimeout(() => router.push('/customer/profile'), 1200);
     }
   } catch (error) {
-    console.error("Error occurred during registration:", error.response ? error.response.data : error);
-    successMessage.value = `An error occurred: ${error.response ? error.response.data : error.message}`;
+    console.error("Error:", error.response ? error.response.data : error);
+    successMessage.value = "An error occurred. Please try again.";
     submitted.value = true;
   }
 };
 </script>
-
 
 <style scoped>
 :root {
@@ -155,13 +169,7 @@ const handleSubmit = async () => {
 .illustration-title { font-size: 3rem; font-weight: 900; color: var(--black); margin:0; }
 .illustration-tag { font-size: 1rem; color: var(--black); margin-top:0.5rem; }
 
-.auth-panel {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0;
-}
-
+.auth-panel { display: flex; justify-content: center; align-items: center; }
 .form-wrapper {
   width: 100%;
   max-width: 440px;
