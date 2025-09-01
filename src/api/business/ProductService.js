@@ -1,7 +1,17 @@
-import axios from 'axios';
-const API_URL = 'http://localhost:8080/api/business/products';
+import axios from 'axios'
 
-export default {
-  getProducts() { return axios.get(API_URL).then(res => res.data); },
-  getProductById(id) { return axios.get(`${API_URL}/${id}`).then(res => res.data); }
-};
+class ApiService {
+  static apiBaseUrl = 'http://localhost:8080/product'
+
+  static async getAllProducts() {
+    try {
+      const response = await axios.get(`${this.apiBaseUrl}/getall`)
+      return response.data
+    } catch (error) {
+      console.error('Error fetching products:', error)
+      throw new Error('Unable to fetch products')
+    }
+  }
+}
+
+export default ApiService
