@@ -2,17 +2,24 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import ProductList from '@/views/business/ProductList.vue'
 import Checkout from '@/views/business/Checkout.vue'
-import AuthPage from '@/views/users/AuthPage.vue'
 
 
 // Admin
 import AdminDashboard from '@/views/users/admin/AdminDashboard.vue'
+
+// Customer
+import customerProfile from '@/views/users/customer/CustomerProfile.vue'
+
+// Generic
+import AuthPage from '@/views/users/AuthPage.vue'
+
 
 
 const routes = [
   { path: '/', name: 'Home', component: ProductList },
   { path: '/checkout', name: 'Checkout', component: Checkout },
   { path: '/auth', name: 'Auth', component: AuthPage },
+  { path: '/customer/profile', name:'cProfile', component:customerProfile},
   { path: '/admin', name: 'AdminDashboard', component: AdminDashboard },
 
 
