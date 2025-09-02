@@ -105,7 +105,7 @@ const handleSubmit = async () => {
       successMessage.value = `Welcome back, ${loggedInUser.firstName}!`;
       submitted.value = true;
 
-      setTimeout(() => router.push('/customer/profile'), 1200);
+      setTimeout(() => router.push('/'), 1200);
 
     } else {
       // Registration

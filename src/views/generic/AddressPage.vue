@@ -1,2 +1,3 @@
-<template><div>Address Page Placeholder</div></template>
-<script lang="ts">export default {};</script>
+// Create Address component in the Components folder, not here 
+// Leave this page empty 
+

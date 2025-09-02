@@ -1,9 +1,8 @@
-// Display the orders that users order history
-// Not a priotity right now (After payment)
+// Display details of each order in the order history (Not a priotity right now)
 
 <template>
   <div class="page">
-    <h1>orders</h1>
+    <h1>Order Details</h1>
   </div>
 </template>
 
