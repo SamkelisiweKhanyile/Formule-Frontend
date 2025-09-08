@@ -43,56 +43,77 @@ export default {
   }
 };
 </script>
-
 <style scoped>
-.profile-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.8rem;
+:root {
+  --cream: #dad7cd;
+  --sage: #a3b18a;
+  --olive: #588157;
+  --forest: #3a5a40;
+  --dark-green: #344e41;
 }
 
+/* Form Layout */
+.profile-form {
+  background-color: #ffffff;
+  padding: 2rem 2.5rem;
+  border-radius: 14px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  max-width: 700px;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transform: scale(0.95); /* Zoom out */
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* Group spacing */
 .form-group {
   display: flex;
   flex-direction: column;
 }
 
 label {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--espresso);
-  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--dark-green);
+  margin-bottom: 0.4rem;
 }
 
+/* Input Fields */
 input {
-  padding: 1rem 1.25rem;
-  border: 2px solid var(--mint);
-  border-radius: 12px;
-  font-size: 1.125rem;
-  color: var(--espresso);
-  background-color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: border 0.3s, box-shadow 0.3s ease;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--sage);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #333;
+  background-color: #fefefc;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 input:focus {
   border-color: var(--olive);
-  box-shadow: 0 0 5px var(--olive);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(88, 129, 87, 0.2);
 }
 
+/* Submit Button */
 button {
-  padding: 1.2rem;
+  align-self: flex-end;
+  padding: 0.75rem 1.5rem;
   background-color: var(--olive);
-  color: var(--cream);
+  color: #fff;
   border: none;
-  border-radius: 12px;
-  font-size: 1.125rem;
-  font-weight: bold;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s ease-in-out;
+  transition: background-color 0.25s ease, transform 0.15s ease;
+  box-shadow: 0 6px 18px rgba(88, 129, 87, 0.15);
 }
 
 button:hover {
-  background-color: var(--taupe);
+  background-color: var(--forest);
   transform: translateY(-2px);
 }
 

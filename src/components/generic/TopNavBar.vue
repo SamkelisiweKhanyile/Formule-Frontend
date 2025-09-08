@@ -20,24 +20,38 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const isMobileMenuOpen = ref(false)
 
+const user = ref(null)
+
+// Load user from localStorage on mount
+onMounted(() => {
+  const savedUser = localStorage.getItem('user')
+  if (savedUser) {
+    user.value = JSON.parse(savedUser)
+  }
+
+  // Listen for changes to localStorage (e.g. from other tabs)
+  window.addEventListener('storage', () => {
+    const updatedUser = localStorage.getItem('user')
+    user.value = updatedUser ? JSON.parse(updatedUser) : null
+  })
+})
+
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
 }
 
-const user = computed(() => {
-  return JSON.parse(localStorage.getItem('user'))
-})
-
 const logout = () => {
   localStorage.removeItem('user')
+  user.value = null
   router.push('/auth')
 }
+
 </script>
 
 <style scoped>
