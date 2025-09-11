@@ -67,12 +67,14 @@
 <script setup>
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import customerAPI from '@/api/users/customerService.js';
+import customerAPI from '@/api/users/CustomerService.js';
+import { useUserStore } from '@/store/userStore.js'; 
 
 const isLogin = ref(true);
 const submitted = ref(false);
 const successMessage = ref('');
 const router = useRouter();
+const userStore = useUserStore(); 
 
 const form = reactive({
   firstName: '',
@@ -100,8 +102,9 @@ const handleSubmit = async () => {
         submitted.value = true;
         return;
       }
-
+      
       localStorage.setItem('userId', loggedInUser.id);
+
       successMessage.value = `Welcome back, ${loggedInUser.firstName}!`;
       submitted.value = true;
 
