@@ -1,19 +1,48 @@
-// Collect data stored when the user pressed the ADD TO CART button
-// It should give you the productid, name, price and quantity
-// Display the products in here
-// Add a "proceed to checkout" button 
-// Make the button prepare the products information to be sent over to the checkout page 
 
 <template>
-  <div class="page">
-    <h1>Cart</h1>
+  <div class="cart-page">
+    <h1>Your Shopping Cart</h1>
+    <Cart v-if="customerId" :customer-id="customerId" />
+    <div v-else class="login-prompt">
+      <p>Please log in to view your cart.</p>
+      <router-link to="/auth" class="login-link">Go to Login</router-link>
+    </div>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { useUserStore } from '@/store/userStore.js';
+import Cart from '@/components/business/Cart.vue';
+
+const userStore = useUserStore();
+const customerId = userStore.user?.id;
+</script>
 
 <style scoped>
-.page {
-  padding: 2rem;
+.cart-page {
+  padding: 2rem 8%;
+  background: #f5fff5;
+  min-height: 80vh;
+}
+
+.cart-page h1 {
+  text-align: center;
+  color: #0a3d0a;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+.login-prompt {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.login-link {
+  display: inline-block;
+  margin-top: 1rem;
+  color: #0a3d0a;
+  text-decoration: underline;
+  font-weight: 500;
 }
 </style>

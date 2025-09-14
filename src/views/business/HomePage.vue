@@ -1,4 +1,4 @@
-<!-- src/pages/HomePage.vue -->
+
 <template>
   <div class="homepage">
     <!-- Hero Section -->
@@ -17,7 +17,7 @@
       <h2>Featured Products</h2>
       <div class="product-grid">
         <ProductCard
-          v-for="product in products.slice(0, 5)"
+          v-for="product in products.slice(1, 11)"
           :key="product.id"
           :product="product"
           @add-to-cart="handleAddToCart"
@@ -40,8 +40,10 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import productAPI from '@/api/business/productService.js'
+import productAPI from '@/api/business/ProductService.js'
 import ProductCard from '@/components/business/ProductCard.vue'
+import { useUserStore } from '@/store/userStore.js';
+import cartAPI from '@/api/business/CartService.js';
 
 const products = ref([])
 
@@ -50,22 +52,30 @@ onMounted(async () => {
     const data = await productAPI.getAll()
     products.value = data
   } catch (error) {
-    console.error("❌ Failed to load products:", error)
+    console.error("Failed to load products:", error)
   }
 })
 
-const loadProducts = async () => {
-  try {
-    const all = await productAPI.getAll()
-    products.value = all.filter(p => p.name !== 'Test Product').slice(0, 5)
-  } catch (error) {
-    console.error('Failed to load products:', error)
-  }
-}
+const handleAddToCart = async (product) => {
+  const userStore = useUserStore();
 
-const handleAddToCart = (product) => {
-  console.log('Adding to cart:', product)
-  // TODO: connect to Pinia cart store or emit to global state
+  if (!userStore.user || !userStore.user.id) {
+    alert("Please log in to add items to cart.");
+    return;
+  }
+
+  try {
+    const cartItem = await cartAPI.addToCart(
+      userStore.user.id, // customerId
+      product.id,        // productId
+      1                  // quantity
+    );
+    alert(`Added ${product.name} to cart!`);
+    console.log("Cart item added:", cartItem);
+  } catch (error) {
+    alert("Failed to add to cart. Please try again.");
+    console.error("Add to cart error:", error);
+  }
 }
 </script>
 
@@ -93,7 +103,7 @@ const handleAddToCart = (product) => {
   justify-content: center;
   padding: 4rem 8%;
   min-height: 50vh;
-  background: url("https://images.unsplash.com/photo-1587019152981-9d0c9b8d9d5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80") center/cover no-repeat;
+  background: url(" https://images.unsplash.com/photo-1587019152981-9d0c9b8d9d5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80") center/cover no-repeat;
   border-radius: 0 0 40px 40px;
 }
 
