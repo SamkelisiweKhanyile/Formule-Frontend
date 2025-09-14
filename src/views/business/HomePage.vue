@@ -1,14 +1,21 @@
-
+<!-- src/pages/HomePage.vue -->
 <template>
-  <div class="homepage">
+  <div class="home">
     <!-- Hero Section -->
     <section class="hero">
-      <div class="overlay"></div>
       <div class="hero-content">
-        <h1 class="title">FORMULÈ</h1>
-        <p class="subtitle">
-          Experience the depth of natural skincare with our premium formula.
-        </p>
+        <h1>Exclusive International Skincare in South Africa</h1>
+      
+        <div class="hero-buttons">
+          <router-link to="/about" class="btn dark">About Us</router-link>
+          <router-link to="/categories" class="btn light">Shop Now</router-link>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img
+          src="https://www.gje.com/wp-content/uploads/2022/06/shutterstock_1055571677-scaled.jpg"
+          alt="Skincare Products"
+        />
       </div>
     </section>
 
@@ -25,16 +32,14 @@
       </div>
     </section>
 
-    <!-- About Us -->
-    <section class="about">
-      <h2>About Us</h2>
-      <p>
-        We believe in harnessing the power of nature to create skincare products
-        that bring out your natural beauty. Our mission is to provide safe,
-        sustainable, and effective solutions that nurture your skin and the
-        planet.
-      </p>
-    </section>
+        <!-- Footer -->
+    <footer class="footer">
+      <p>© 2025 FÓRMULĒ. All rights reserved.</p>
+      <div class="footer-links">
+        <router-link to="/privacy">Privacy Policy</router-link>
+        <router-link to="/terms">Terms & Conditions</router-link>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -42,8 +47,6 @@
 import { onMounted, ref } from 'vue'
 import productAPI from '@/api/business/ProductService.js'
 import ProductCard from '@/components/business/ProductCard.vue'
-import { useUserStore } from '@/store/userStore.js';
-import cartAPI from '@/api/business/CartService.js';
 
 const products = ref([])
 
@@ -52,47 +55,21 @@ onMounted(async () => {
     const data = await productAPI.getAll()
     products.value = data
   } catch (error) {
-    console.error("Failed to load products:", error)
+    console.error('❌ Failed to load products:', error)
   }
 })
 
-const handleAddToCart = async (product) => {
-  const userStore = useUserStore();
-
-  if (!userStore.user || !userStore.user.id) {
-    alert("Please log in to add items to cart.");
-    return;
-  }
-
-  try {
-    const cartItem = await cartAPI.addToCart(
-      userStore.user.id, // customerId
-      product.id,        // productId
-      1                  // quantity
-    );
-    alert(`Added ${product.name} to cart!`);
-    console.log("Cart item added:", cartItem);
-  } catch (error) {
-    alert("Failed to add to cart. Please try again.");
-    console.error("Add to cart error:", error);
-  }
+const handleAddToCart = (product) => {
+  console.log('Adding to cart:', product)
+  // TODO: connect to Pinia cart store or global state
 }
 </script>
 
 <style scoped>
-.homepage {
+/* General */
+.home {
   font-family: 'Poppins', sans-serif;
-  color: #1a1a1a;
-  overflow-x: hidden;
-  transform: scale(0.90); 
-}
-
-:root {
-  --cream: #dad7cd;
-  --sage: #a3b18a;
-  --olive: #588157;
-  --forest: #3a5a40;
-  --dark-green: #344e41;
+  color: #333;
 }
 
 /* Hero Section */
@@ -101,77 +78,118 @@ const handleAddToCart = async (product) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4rem 8%;
-  min-height: 50vh;
-  background: url(" https://images.unsplash.com/photo-1587019152981-9d0c9b8d9d5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80") center/cover no-repeat;
+  background: #fdfdfd;
+  padding: 4rem 6rem;
   border-radius: 0 0 40px 40px;
-}
-
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(200, 255, 200, 0.6);
-  border-radius: 0 0 40px 40px;
+  min-height: 200px;
 }
 
 .hero-content {
   position: relative;
-  text-align: center;
   z-index: 1;
-  max-width: 700px;
+  max-width: 50%;
 }
 
-.title {
-  font-size: 3rem;
+.hero-content h1 {
+  font-size: 2.8rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #0a3d0a;
+  color: black;
 }
 
-.subtitle {
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-  color: #333;
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
 }
 
+.hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.8rem 1.8rem;
+  border-radius: 30px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn.dark {
+  background: #000;
+  color: #fff;
+}
+
+.btn.light {
+  background: #fff;
+  color: #000;
+  border: 1px solid #ccc;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+}
+
+/* Featured Section */
 .featured {
-  padding: 3rem 8%;
-  background: #f5fff5;
+  padding: 4rem 6rem;
   text-align: center;
+  background: beige;
 }
 
 .featured h2 {
   font-size: 2rem;
-  margin-bottom: 2rem;
-  color: #0a3d0a;
+  margin-bottom: 2.5rem;
 }
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 2rem;
   justify-items: center;
 }
 
-/* About Us */
-.about {
-  padding: 4rem 8%;
+/* Footer */
+.footer {
+  background: rgb(28, 75, 28);
   text-align: center;
-  background: #e8fce8;
-  border-radius: 40px;
-  margin: 2rem auto;
-  max-width: 900px;
+  padding: 1.5rem 0;
+  margin-top: auto;
 }
 
-.about h2 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  color: #0a3d0a;
+.footer p {
+  margin-bottom: 0.5rem;
+  color: black;
 }
 
-.about p {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  color: #333;
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: black;
+  font-size: 0.9rem;
+}
+
+.footer-links a:hover {
+  color: yellowgreen;
 }
 </style>
