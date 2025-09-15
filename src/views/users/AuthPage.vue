@@ -90,20 +90,23 @@ const handleSubmit = async () => {
 
   try {
     if (isLogin.value) {
-      // Login
+      // Get all users (client-side auth)
       const users = await customerAPI.getAll();
-      console.log("Users returned from backend:", users);
       const loggedInUser = users.find(
         u => u.emailAddress === form.emailAddress && u.password === form.password
       );
 
-      if (!loggedInUser) {1
+      if (!loggedInUser) {
         successMessage.value = "Invalid email or password!";
         submitted.value = true;
         return;
       }
-      
-      localStorage.setItem('userId', loggedInUser.id);
+
+      // ✅ SET USER IN PINIA STORE — this was missing!
+      userStore.setUser(loggedInUser);
+
+      // ✅ Save full user to localStorage (for page refresh)
+      localStorage.setItem('user', JSON.stringify(loggedInUser));
 
       successMessage.value = `Welcome back, ${loggedInUser.firstName}!`;
       submitted.value = true;
@@ -121,7 +124,12 @@ const handleSubmit = async () => {
       };
 
       const newCustomer = await customerAPI.create(customerData);
-      localStorage.setItem('userId', newCustomer.id);
+
+      // ✅ SET USER IN STORE
+      userStore.setUser(newCustomer);
+
+      // ✅ SAVE TO LOCAL STORAGE
+      localStorage.setItem('user', JSON.stringify(newCustomer));
 
       successMessage.value = `Thank you for joining, ${newCustomer.firstName}!`;
       submitted.value = true;
