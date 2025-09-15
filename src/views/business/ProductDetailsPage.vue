@@ -15,6 +15,7 @@
         <!-- Add more details as available from the backend, e.g., ingredients, size, etc. -->
         <div class="button-group">
           <button class="cart-btn" @click="addToCart">Add to Cart</button>
+          <router-link to="/categories" class="return-btn">Return to Categories</router-link>
         </div>
       </div>
     </div>
@@ -34,7 +35,7 @@ const product = ref(null)
 onMounted(async () => {
   const productId = route.params.id
   try {
-    const data = await productAPI.getById(productId)  // Assuming your API has a getById method; adjust if it's getOne or similar
+    const data = await productAPI.getById(productId) 
     product.value = data
   } catch (error) {
     console.error('❌ Failed to load product details:', error)
@@ -131,5 +132,24 @@ function getImageUrl(url) {
 
 .cart-btn:hover {
   background: #116611;
+}
+
+.return-btn {
+  background: #0a3d0a;
+  color: white;
+  text-decoration: none;
+  padding: 0.8rem 2rem;
+  border-radius: 30px;
+  font-size: 1rem;
+  transition: background 0.2s ease;
+  border: none;
+  cursor: pointer;
+  margin-top: 0.3rem;
+  display: inline-block;
+}
+
+.return-btn:hover {
+  background: #cce3cc;
+  color: #116611;
 }
 </style>
