@@ -4,147 +4,219 @@
 // When a product is selected, redirect user to (ProductDetailsPage.vue) with the neccesarry data
 
 <template>
-  <div class="categories">
-    <h3>Shop By Category</h3>
+  <div class="category-page">
+    <h2>Shop by Categories</h2>
 
-    <!-- Category Buttons -->
-    <ul class="category-buttons">
-      <!-- "All" button -->
-      <li>
-        <button
-          :class="{ active: !selectedCategory }"
-          @click="selectCategory(null)"
-        >
-          All
-        </button>
-      </li>
-
-      <!-- Dynamic categories -->
-      <li v-for="cat in categories" :key="cat.id">
-        <button
-          :class="{ active: selectedCategory === cat.id }"
-          @click="selectCategory(cat.id)"
-        >
-          {{ cat.name }}
-        </button>
-      </li>
-    </ul>
-
-    <!-- Products Grid -->
-    <div class="product-grid">
-      <router-link
-        v-for="product in filteredProducts"
-        :key="product.id"
-        :to="{ name: 'productDetails', params: { id: product.id } }"
-        style="text-decoration: none; color: inherit;"
+    <!-- Category buttons -->
+    <div class="categories">
+      <button
+        v-for="cat in categories"
+        :key="cat.id"
+        :class="{ active: cat.id === selectedCategoryId }"
+        @click="fetchProducts(cat.id)"
       >
-        <ProductCard :product="product" />
-      </router-link>
+        {{ cat.name }}
+      </button>
+    </div>
+
+    <h3>Products</h3>
+    <div class="products">
+      <div v-for="prod in products" :key="prod.id" class="product-card">
+        <!-- Display image using mapped field -->
+        <img
+          :src="getImageUrl(prod.imageUrl)"
+          :alt="prod.name"
+          class="product-img"
+          @error="prod.imageUrl = fallbackImage"
+        />
+        <div class="product-info">
+          <h4 class="product-name">{{ prod.name }}</h4>
+          <p class="product-brand" v-if="prod.brand">Brand: {{ prod.brand }}</p>
+          <p class="product-price">Price: <strong>R{{ prod.price }}</strong></p>
+        </div>
+        <button class="add-to-cart-btn" @click="addToCart(prod)">
+          Add to Cart 
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
-import { useRouter } from "vue-router";
-import CategoryService from "@/api/business/CategoryService.js";
-import productAPI from "@/api/business/ProductService.js";
-import ProductCard from "@/components/business/ProductCard.vue";
+import { ref, onMounted } from 'vue'
+import CategoryService from '@/api/business/CategoryService'
 
-const categories = ref([]);
-const products = ref([]);
-const selectedCategory = ref(null);
+const categories = ref([])
+const products = ref([])
+const selectedCategoryId = ref(null)
 
-const router = useRouter();
+// Use same logic as your product-card
+const fallbackImage = 'https://placehold.co/300x300?text=No+Image'
 
-// Fetch categories on mount
-onMounted(async () => {
-  try {
-    const res = await CategoryService.getAllCategories();
-    categories.value = res.data || res;
-    loadProducts();
-  } catch (err) {
-    console.error("Error fetching categories:", err);
+function getImageUrl(url) {
+  if (!url) return fallbackImage
+  if (url.includes('dropbox.com')) {
+    return url
+      .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+      .replace('?dl=0', '')
   }
-});
+  return url
+}
 
-// Select category function
-const selectCategory = async (id) => {
-  selectedCategory.value = id;
-  // Optionally update the route
-  if (id) {
-    router.push({ name: "Category", params: { id } });
-  } else {
-    router.push({ name: "Categories" });
-  }
-  await loadProducts();
-};
-
-// Load products based on selected category
-const loadProducts = async () => {
+const fetchCategories = async () => {
   try {
-    if (selectedCategory.value) {
-      const res = await productAPI.getProductsByCategory(selectedCategory.value);
-      products.value = res.data || res;
-    } else {
-      const res = await productAPI.getAll();
-      products.value = res.data || res;
+    const response = await CategoryService.getAllCategories()
+    categories.value = response.data
+    if (categories.value.length > 0) {
+      fetchProducts(categories.value[0].id)
     }
   } catch (error) {
-    console.error("❌ Failed to load products:", error);
+    console.error('Error fetching categories:', error)
   }
-};
+}
 
-const filteredProducts = computed(() => {
-  if (!selectedCategory.value) {
-    return products.value;
+const fetchProducts = async (categoryId) => {
+  try {
+    selectedCategoryId.value = categoryId
+    const response = await CategoryService.getProductsByCategory(categoryId)
+
+    // ✅ Map backend field to imageUrl for frontend
+    products.value = response.data.map(prod => ({
+      ...prod,
+      imageUrl: prod.imageUrl || prod.image_url || '', // map actual backend field
+      brand: prod.brand || 'Unknown Brand' // fallback for brand
+    }))
+
+    console.log('Products mapped:', products.value)
+  } catch (error) {
+    console.error('Error fetching products:', error)
   }
-  return products.value.filter(p => p.categoryId === selectedCategory.value);
-});
+}
+
+// 🛒 Add to Cart Function (placeholder — integrate with your cart store later)
+const addToCart = (product) => {
+  console.log('Added to cart:', product)
+  // Example: cartStore.addToCart(product)
+  alert(`${product.name} added to cart!`)
+}
+
+onMounted(fetchCategories)
 </script>
 
 <style scoped>
+.category-page {
+  padding: 2rem;
+  background: #eaebca;
+  color: white;
+  min-height: 100vh;
+}
+
+.category-page h2,
+.category-page h3 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #a3b18a;
+}
+
 .categories {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.categories button {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  background: #54d127;
+  color: white;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.categories button:hover {
+  background: #444;
+}
+
+.categories button.active {
+  background: #63a753;
+  box-shadow: 0 0 8px rgba(89, 142, 66, 0.5);
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
   padding: 1rem;
 }
 
-h3 {
-  font-size: 1.8rem;
+.product-card {
+  background: #fbfbfb;
+  padding: 1.25rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.product-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
   margin-bottom: 1rem;
-  color: #344e41;
-}
-
-.category-buttons {
-  list-style: none;
-  display: flex;
-  gap: 0.8rem;
-  padding: 0;
-  margin-bottom: 2rem;
-}
-
-.category-buttons li button {
-  border: none;
-  padding: 0.5rem 1rem;
   border-radius: 8px;
-  background-color: #e5e5e5;
+  background: #333;
+}
+
+.product-info {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.product-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+  color: #838f55;
+}
+
+.product-brand {
+  font-size: 0.9rem;
+  color: #a3b18a;
+  margin: 0.25rem 0;
+}
+
+.product-price {
+  font-size: 1.1rem;
+  color: #f4a261;
+  margin: 0.5rem 0;
+}
+
+.add-to-cart-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #114a22;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
+  transition: background 0.2s ease;
 }
 
-.category-buttons li button:hover {
-  background-color: #a3b18a;
-  color: #fff;
+.add-to-cart-btn:hover {
+  background: #66d558;
 }
 
-.category-buttons li button.active {
-  background-color: #344e41;
-  color: #fff;
-}
-
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 2rem;
+.add-to-cart-btn:active {
+  transform: scale(0.98);
 }
 </style>
