@@ -5,7 +5,6 @@
     <section class="hero">
       <div class="hero-content">
         <h1>Exclusive International Skincare in South Africa</h1>
-      
         <div class="hero-buttons">
           <router-link to="/about" class="btn dark">About Us</router-link>
           <router-link to="/categories" class="btn light">Shop Now</router-link>
@@ -32,7 +31,7 @@
       </div>
     </section>
 
-        <!-- Footer -->
+    <!-- Footer -->
     <footer class="footer">
       <p>© 2025 FÓRMULĒ. All rights reserved.</p>
       <div class="footer-links">
@@ -44,25 +43,44 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import productAPI from '@/api/business/ProductService.js'
-import ProductCard from '@/components/business/ProductCard.vue'
+import { onMounted, ref } from 'vue';
+import { useUserStore } from '@/store/userStore.js';
+import productAPI from '@/api/business/ProductService.js';
+import cartAPI from '@/api/business/CartService.js';
+import ProductCard from '@/components/business/ProductCard.vue';
 
-const products = ref([])
+const products = ref([]);
+const userStore = useUserStore();
 
 onMounted(async () => {
   try {
-    const data = await productAPI.getAll()
-    products.value = data
+    const data = await productAPI.getAll();
+    products.value = data;
   } catch (error) {
-    console.error('❌ Failed to load products:', error)
+    console.error('❌ Failed to load products:', error);
   }
-})
+});
 
-const handleAddToCart = (product) => {
-  console.log('Adding to cart:', product)
-  // TODO: connect to Pinia cart store or global state
-}
+const handleAddToCart = async (product) => {
+  if (!userStore.user?.id) {
+    alert("Please log in to add items to cart.");
+    return;
+  }
+
+  try {
+    // Add 1 quantity of this product to cart
+    await cartAPI.addToCart(
+      userStore.user.id, // customerId
+      product.id,        // productId
+      1                  // quantity
+    );
+
+    alert(`${product.name} added to cart!`);
+  } catch (error) {
+    console.error("Failed to add to cart:", error);
+    alert("Failed to add item to cart. Please try again.");
+  }
+};
 </script>
 
 <style scoped>
