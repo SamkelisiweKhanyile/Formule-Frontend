@@ -1,6 +1,7 @@
 <!-- src/components/products/ProductCard.vue -->
 <template>
   <div class="product-card">
+    <router-link :to="{ name: 'productDetails', params: { id: product.id } }">
     <img :src="getImageUrl(product.image_url)" alt="Product image" class="product-img" />
     <div class="product-info">
       <h3>{{ product.name }}</h3>
@@ -8,10 +9,11 @@
       <p class="price">R{{ product.price }}</p>
 
       <div class="button-group">
-        <router-link :to="`/products/${product.id}`" class="view-btn">View Product</router-link>
+        <!-- <router-link :to="`/products/${product.id}`" class="view-btn">View Product</router-link> -->
         <button class="cart-btn" @click="addToCart">Add to Cart</button>
       </div>
     </div>
+    </router-link>
   </div>
 </template>
 
