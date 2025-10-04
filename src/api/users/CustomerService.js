@@ -15,19 +15,7 @@ const customerAPI = {
     }
   },
 
-  // login: async (email, password) => {
-  //   try {
-  //     const response = await axios.post(`${apiUrl}/login`, {
-  //       emailAddress: email,
-  //       password: password
-  //     });
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error("❌ Login failed:", error.response?.data || error.message);
-  //     throw error;
-  //   }
-  // },
-
+  
   getAll: async () => {
     try {
       const response = await axios.get(`${apiUrl}/getAll`);
@@ -68,7 +56,20 @@ const customerAPI = {
       console.error("Error deleting customer:", error.response ? error.response.data : error.message);
       throw error;
     }
+  },
+
+  login: async (email, password) => {
+  try {
+    const response = await axios.post(`${apiUrl}/login`, {
+      email: email,
+      password: password
+    });
+    return response.data;
+  } catch (error) {
+    console.error("❌ Login failed:", error.response?.data || error.message);
+    throw error;
   }
+},
 
   
 };

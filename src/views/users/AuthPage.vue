@@ -90,31 +90,18 @@ const handleSubmit = async () => {
 
   try {
     if (isLogin.value) {
-      // Get all users (client-side auth)
-      const users = await customerAPI.getAll();
-      const loggedInUser = users.find(
-        u => u.emailAddress === form.emailAddress && u.password === form.password
-      );
+      // LOGIN
+      const loggedInUser = await customerAPI.login(form.emailAddress, form.password);
 
-      if (!loggedInUser) {
-        successMessage.value = "Invalid email or password!";
-        submitted.value = true;
-        return;
-      }
-
-      // ✅ SET USER IN PINIA STORE — this was missing!
       userStore.setUser(loggedInUser);
-
-      // ✅ Save full user to localStorage (for page refresh)
       localStorage.setItem('user', JSON.stringify(loggedInUser));
 
       successMessage.value = `Welcome back, ${loggedInUser.firstName}!`;
       submitted.value = true;
 
       setTimeout(() => router.push('/'), 1200);
-
     } else {
-      // Registration
+      // REGISTRATION
       const customerData = {
         firstName: form.firstName,
         lastName: form.lastName,
@@ -125,10 +112,7 @@ const handleSubmit = async () => {
 
       const newCustomer = await customerAPI.create(customerData);
 
-      // ✅ SET USER IN STORE
       userStore.setUser(newCustomer);
-
-      // ✅ SAVE TO LOCAL STORAGE
       localStorage.setItem('user', JSON.stringify(newCustomer));
 
       successMessage.value = `Thank you for joining, ${newCustomer.firstName}!`;
@@ -137,7 +121,7 @@ const handleSubmit = async () => {
       setTimeout(() => router.push('/customer/profile'), 1200);
     }
   } catch (error) {
-    console.error("Error:", error.response ? error.response.data : error);
+    console.error("Error:", error.response?.data || error.message);
     successMessage.value = "An error occurred. Please try again.";
     submitted.value = true;
   }
