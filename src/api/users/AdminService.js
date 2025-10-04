@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiUrl = 'http://localhost:8080/formule/admin';
+const apiUrl = 'http://localhost:8080/admin';
 
 const adminAPI = {
 

@@ -1,17 +1,17 @@
 <template>
   <header class="top-nav-bar">
     <div class="logo">
-      <router-link to="/">LOGO (Coming Soon)</router-link>
+      <router-link to="/">Formulé</router-link>
     </div>
 
     <nav :class="{ open: isMobileMenuOpen }">
       <router-link to="/">Home</router-link>
       <router-link to="/categories">Categories</router-link>
       <router-link to="/cart">Cart</router-link>
-      <router-link to="/orders">Orders</router-link>
-      <router-link v-if="user && user.role === 'admin'" to="/admin">Admin</router-link>
+      <router-link v-if="user" to="/orders">Orders</router-link>
+      <router-link v-if="user?.role === 'admin'" to="/admin">Admin</router-link>
       <router-link v-if="user" to="/customer/profile">My Profile</router-link>
-      <router-link v-if="!user" to="/auth">Login</router-link>
+      <router-link v-else to="/auth">Create an Account</router-link>
       <button v-if="user" class="logout-btn" @click="logout">Logout</button>
     </nav>
 
@@ -19,116 +19,128 @@
   </header>
 </template>
 
+
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/store/userStore'
+import { storeToRefs } from 'pinia'
 
 const router = useRouter()
 const isMobileMenuOpen = ref(false)
 
-const user = ref(null)
-
-// Load user from localStorage on mount
-onMounted(() => {
-  const savedUser = localStorage.getItem('user')
-  if (savedUser) {
-    user.value = JSON.parse(savedUser)
-  }
-
-  // Listen for changes to localStorage (e.g. from other tabs)
-  window.addEventListener('storage', () => {
-    const updatedUser = localStorage.getItem('user')
-    user.value = updatedUser ? JSON.parse(updatedUser) : null
-  })
-})
+const userStore = useUserStore()
+const { user } = storeToRefs(userStore)
 
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
 }
 
 const logout = () => {
-  localStorage.removeItem('user')
-  user.value = null
+  userStore.logout()
   router.push('/auth')
 }
-
 </script>
 
 <style scoped>
 :root {
-  --cream: #dad7cd;
-  --sage: #a3b18a;
-  --olive: #588157;
-  --forest: #3a5a40;
-  --dark-green: #344e41;
+  --bg-glass: rgba(255, 255, 255, 0.08);
+  --text-light: #f1f1f1;
+  --highlight: #cce3de;
+  --accent: #a4c3b2;
+  --dark-green: #2a3b36;
+  --deep-green: #1e2b27;
+  --shadow: rgba(0, 0, 0, 0.2);
 }
 
 .top-nav-bar {
-  background-color: var(--forest);
-  color: var(--cream);
+  backdrop-filter: blur(10px);
+  background-color: var(--bg-glass);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.4rem 2rem;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  font-family: 'Helvetica Neue', sans-serif;
-  position: relative;
-  z-index: 20;
+  padding: 1.2rem 2.4rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 8px 30px var(--shadow);
 }
 
 .logo a {
   font-size: 2rem;
-  font-weight: 700;
-  font-family: 'Playfair Display', serif;
-  color: var(--cream);
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--text-light);
   text-decoration: none;
-  letter-spacing: 1px;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease;
 }
 
 .logo a:hover {
-  color: var(--sage);
+  color: var(--highlight);
 }
-
 
 nav {
   display: flex;
-  gap: 1.8rem;
   align-items: center;
+  gap: 2rem;
 }
 
 nav a,
 nav button.logout-btn {
-  color: var(--cream);
-  background-color: transparent;
+  font-size: 0.95rem;
+  padding: 0.6rem 1.2rem;
+  background: transparent;
   border: none;
-  text-decoration: none;
-  font-size: 1rem;
+  border-radius: 30px;
+  color: var(--text-light);
   font-weight: 500;
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
 }
 
-nav a:hover,
-nav button.logout-btn:hover {
-  background-color: var(--sage);
-  color: var(--dark-green);
-  box-shadow: 0 4px 10px rgba(163, 177, 138, 0.3);
+nav a::after,
+nav button.logout-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0%;
+  height: 2px;
+  background: var(--highlight);
+  transition: width 0.3s ease, left 0.3s ease;
 }
 
+nav a:hover::after,
+nav button.logout-btn:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+nav a:hover,
+nav button.logout-btn:hover {
+  background-color: var(--deep-green);
+  color: var(--highlight);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.08);
+}
 
 .menu-btn {
   display: none;
   font-size: 2rem;
-  color: var(--cream);
+  color: var(--text-light);
   background: none;
   border: none;
   cursor: pointer;
+  z-index: 101;
+  transition: transform 0.2s ease;
 }
 
+.menu-btn:hover {
+  transform: scale(1.1);
+}
 
 @media (max-width: 768px) {
   nav {
@@ -139,11 +151,12 @@ nav button.logout-btn:hover {
     top: 100%;
     left: 0;
     width: 100%;
-    background-color: var(--dark-green);
-    padding: 1rem 2rem;
-    z-index: 10;
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
-    animation: fadeIn 0.3s ease-in-out;
+    padding: 2rem;
+    background-color: rgba(17, 27, 23, 0.98);
+    box-shadow: 0 12px 24px var(--shadow);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    animation: slideDown 0.3s ease forwards;
   }
 
   nav.open {
@@ -155,10 +168,10 @@ nav button.logout-btn:hover {
   }
 }
 
-@keyframes fadeIn {
+@keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-0.5rem);
+    transform: translateY(-1rem);
   }
   to {
     opacity: 1;

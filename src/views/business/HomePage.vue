@@ -4,17 +4,39 @@
     <!-- Hero Section -->
     <section class="hero">
       <div class="hero-content">
-        <h1>Exclusive International Skincare in South Africa</h1>
+        <h1 class="hero-title">Exclusive International Skincare in South Africa</h1>
+        <p class="hero-subtitle">Elevate your beauty ritual with luxury products crafted for your glow.</p>
         <div class="hero-buttons">
-          <router-link to="/about" class="btn dark">About Us</router-link>
-          <router-link to="/categories" class="btn light">Shop Now</router-link>
+          <router-link to="/about" class="btn btn-gradient-dark">About Us</router-link>
+          <router-link to="/categories" class="btn btn-gradient-light">Shop Now</router-link>
         </div>
       </div>
-      <div class="hero-image">
+      <div class="hero-image" aria-hidden="true">
         <img
           src="https://www.gje.com/wp-content/uploads/2022/06/shutterstock_1055571677-scaled.jpg"
-          alt="Skincare Products"
+          alt="Luxury Skincare Products"
+          loading="lazy"
         />
+        <div class="image-overlay"></div>
+      </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+      <h2>What Our Customers Say</h2>
+      <div class="testimonial-cards">
+        <blockquote>
+          <p>“Formulé changed my skincare routine completely. My skin has never felt this radiant!”</p>
+          <footer>— Sarah M.</footer>
+        </blockquote>
+        <blockquote>
+          <p>“Quality products with a touch of elegance. Highly recommend to anyone looking for luxury skincare.”</p>
+          <footer>— Thabo D.</footer>
+        </blockquote>
+        <blockquote>
+          <p>“Fast delivery and amazing customer support. I’m obsessed with the moisturizing line!”</p>
+          <footer>— Lindiwe K.</footer>
+        </blockquote>
       </div>
     </section>
 
@@ -23,12 +45,29 @@
       <h2>Featured Products</h2>
       <div class="product-grid">
         <ProductCard
-          v-for="product in products.slice(1, 11)"
+          v-for="product in products.slice(0, 8)"
           :key="product.id"
           :product="product"
           @add-to-cart="handleAddToCart"
         />
       </div>
+    </section>
+
+    <!-- Newsletter Signup -->
+    <section class="newsletter">
+      <h2>Join Our Wellness Community</h2>
+      <p>Subscribe to receive exclusive offers, beauty tips, and the latest product launches.</p>
+      <form @submit.prevent="handleSubscribe" class="newsletter-form">
+        <input
+          v-model="email"
+          type="email"
+          placeholder="Enter your email address"
+          required
+          aria-label="Email address"
+        />
+        <button type="submit" class="btn btn-subscribe">Subscribe</button>
+      </form>
+      <p v-if="subscribeMessage" class="subscribe-message">{{ subscribeMessage }}</p>
     </section>
 
     <!-- Footer -->
@@ -51,6 +90,8 @@ import ProductCard from '@/components/business/ProductCard.vue';
 
 const products = ref([]);
 const userStore = useUserStore();
+const email = ref('');
+const subscribeMessage = ref('');
 
 onMounted(async () => {
   try {
@@ -68,146 +109,347 @@ const handleAddToCart = async (product) => {
   }
 
   try {
-    // Add 1 quantity of this product to cart
-    await cartAPI.addToCart(
-      userStore.user.id, // customerId
-      product.id,        // productId
-      1                  // quantity
-    );
-
+    await cartAPI.addToCart(userStore.user.id, product.id, 1);
     alert(`${product.name} added to cart!`);
   } catch (error) {
     console.error("Failed to add to cart:", error);
     alert("Failed to add item to cart. Please try again.");
   }
 };
+
+const handleSubscribe = () => {
+  // Dummy subscription logic (replace with real API call)
+  subscribeMessage.value = `Thanks for subscribing, we'll keep you glowing! ✨`;
+  email.value = '';
+};
 </script>
 
 <style scoped>
-/* General */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap');
+
 .home {
   font-family: 'Poppins', sans-serif;
-  color: #333;
+  color: #2d2d2d;
+  background: #fffefa;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
 }
 
 /* Hero Section */
 .hero {
-  position: relative;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  background: #fdfdfd;
   padding: 4rem 6rem;
-  border-radius: 0 0 40px 40px;
-  min-height: 200px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #c1d7ae, #f7f3e8);
+  border-radius: 0 0 4rem 4rem; 
 }
 
 .hero-content {
-  position: relative;
-  z-index: 1;
-  max-width: 50%;
+  max-width: 45%;
+  z-index: 2;
 }
 
-.hero-content h1 {
-  font-size: 2.8rem;
-  font-weight: 600;
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
   margin-bottom: 1rem;
-  color: black;
+  line-height: 1.1;
+  color: #30491e;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hero-subtitle {
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin-bottom: 2.5rem;
+  color: #556b2f;
+  opacity: 0.85;
 }
 
 .hero-buttons {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
+}
+
+.btn {
+  border-radius: 50px;
+  font-weight: 600;
+  padding: 0.85rem 2.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 5px 15px rgba(61,94,34,0.25);
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.btn-gradient-dark {
+  background: linear-gradient(135deg, #30491e, #556b2f);
+  color: #fff;
+  border: none;
+}
+
+.btn-gradient-dark:hover {
+  background: linear-gradient(135deg, #556b2f, #30491e);
+  box-shadow: 0 8px 20px rgba(85,107,47,0.5);
+  transform: translateY(-4px);
+}
+
+.btn-gradient-light {
+  background: #fff;
+  color: #30491e;
+  border: 2px solid #30491e;
+}
+
+.btn-gradient-light:hover {
+  background: #556b2f;
+  color: #fff;
+  border-color: #556b2f;
+  box-shadow: 0 8px 20px rgba(85,107,47,0.3);
+  transform: translateY(-4px);
 }
 
 .hero-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
+  flex: 1;
+  position: relative;
+  height: 420px;
+  border-radius: 2rem;
   overflow: hidden;
+  box-shadow: 0 20px 40px rgba(61,94,34,0.2);
+  z-index: 1;
 }
 
 .hero-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 0;
-  box-shadow: none;
+  filter: brightness(0.9);
+  transition: transform 0.5s ease;
+  border-radius: 2rem;
 }
 
-/* Buttons */
-.btn {
-  padding: 0.8rem 1.8rem;
-  border-radius: 30px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.3s ease;
+.hero-image:hover img {
+  transform: scale(1.05);
 }
 
-.btn.dark {
-  background: #000;
-  color: #fff;
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(85,107,47,0.25), rgba(255,255,255,0.1));
+  pointer-events: none;
 }
 
-.btn.light {
+/* Testimonials */
+.testimonials {
+  padding: 4rem 6rem;
+  background: #f5f7ed;
+  text-align: center;
+}
+
+.testimonials h2 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 2.5rem;
+  color: #30491e;
+}
+
+.testimonial-cards {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.testimonial-cards blockquote {
   background: #fff;
-  color: #000;
-  border: 1px solid #ccc;
+  padding: 2rem 2.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  max-width: 320px;
+  font-style: italic;
+  color: #556b2f;
+  position: relative;
+  transition: transform 0.3s ease;
 }
 
-.btn:hover {
-  transform: translateY(-3px);
+.testimonial-cards blockquote:hover {
+  transform: translateY(-6px);
 }
 
-/* Featured Section */
+.testimonial-cards blockquote p {
+  margin-bottom: 1.25rem;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.testimonial-cards blockquote footer {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #30491e;
+  text-align: right;
+}
+
+/* Featured Products */
 .featured {
   padding: 4rem 6rem;
   text-align: center;
-  background: beige;
 }
 
 .featured h2 {
-  font-size: 2rem;
-  margin-bottom: 2.5rem;
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 3rem;
+  color: #30491e;
 }
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit,minmax(260px, 1fr));
+  gap: 2.5rem;
   justify-items: center;
+}
+
+/* Newsletter */
+.newsletter {
+  background: #30491e;
+  color: #fff;
+  text-align: center;
+  padding: 3.5rem 2rem;
+  margin: 4rem 6rem;
+  border-radius: 2rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.newsletter h2 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.newsletter p {
+  font-weight: 400;
+  margin-bottom: 2.5rem;
+  opacity: 0.85;
+}
+
+.newsletter-form {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.newsletter-form input {
+  padding: 0.85rem 1.5rem;
+  border-radius: 50px;
+  border: none;
+  font-size: 1rem;
+  width: 280px;
+  max-width: 100%;
+  outline: none;
+}
+
+.newsletter-form button {
+  background: #f7f3e8;
+  color: #30491e;
+  border: none;
+  border-radius: 50px;
+  font-weight: 700;
+  padding: 0.85rem 2.5rem;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(247,243,232,0.6);
+  transition: all 0.3s ease;
+}
+
+.newsletter-form button:hover {
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(247,243,232,0.9);
+  transform: translateY(-3px);
+}
+
+.subscribe-message {
+  margin-top: 1rem;
+  font-style: italic;
+  color: #d4e157;
+  font-weight: 600;
 }
 
 /* Footer */
 .footer {
-  background: rgb(28, 75, 28);
+  background: #1c4b1c;
   text-align: center;
   padding: 1.5rem 0;
   margin-top: auto;
-}
-
-.footer p {
-  margin-bottom: 0.5rem;
-  color: black;
+  color: #d4e157;
+  font-weight: 500;
 }
 
 .footer-links {
+  margin-top: 0.5rem;
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 2rem;
 }
 
 .footer-links a {
   text-decoration: none;
-  color: black;
-  font-size: 0.9rem;
+  color: #d4e157;
+  font-weight: 500;
+  transition: color 0.3s ease;
 }
 
 .footer-links a:hover {
-  color: yellowgreen;
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .hero {
+    flex-direction: column;
+    padding: 3rem 2rem;
+    border-radius: 0 0 3rem 3rem;
+  }
+  .hero-content {
+    max-width: 100%;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  .hero-image {
+    height: 300px;
+    width: 90vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+  .testimonial-cards {
+    flex-direction: column;
+    gap: 1.8rem;
+  }
+  .newsletter {
+    margin: 3rem 1rem;
+    padding: 3rem 1.5rem;
+  }
+  .newsletter-form {
+    flex-direction: column;
+  }
+  .newsletter-form input,
+  .newsletter-form button {
+    width: 100%;
+  }
 }
 </style>

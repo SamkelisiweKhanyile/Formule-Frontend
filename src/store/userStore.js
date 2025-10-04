@@ -3,17 +3,17 @@ import { defineStore } from 'pinia';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    user: null
+    user: null,
   }),
   actions: {
     setUser(user) {
       this.user = user;
+      localStorage.setItem('user', JSON.stringify(user)); // ← make sure this is set here
     },
     logout() {
       this.user = null;
       localStorage.removeItem('user');
     },
-    // 👇 Add this to restore user on refresh
     initialize() {
       const saved = localStorage.getItem('user');
       if (saved) {
@@ -25,6 +25,6 @@ export const useUserStore = defineStore('user', {
           localStorage.removeItem('user');
         }
       }
-    }
-  }
+    },
+  },
 });

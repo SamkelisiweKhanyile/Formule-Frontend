@@ -31,13 +31,23 @@
               <label for="firstName">First Name</label>
               <input id="firstName" v-model="form.firstName" type="text" required />
             </div>
+
             <div class="form-group">
               <label for="lastName">Last Name</label>
               <input id="lastName" v-model="form.lastName" type="text" required />
             </div>
+
             <div class="form-group">
               <label for="phoneNumber">Phone Number</label>
-              <input id="phoneNumber" v-model="form.phoneNumber" type="tel" required />
+              <input
+                id="phoneNumber"
+                v-model="form.phoneNumber"
+                type="tel"
+                required
+                placeholder="e.g. 0123456789"
+                pattern="[0-9]{10}"
+                maxlength="10"
+              />
             </div>
           </template>
 
@@ -45,12 +55,21 @@
             <label for="emailAddress">Email Address</label>
             <input id="emailAddress" v-model="form.emailAddress" type="email" required />
           </div>
+
           <div class="form-group">
             <label for="password">Password</label>
             <input id="password" v-model="form.password" type="password" required />
           </div>
 
-          <button type="submit" class="submit-btn">{{ isLogin ? 'Login' : 'Register' }}</button>
+          <!-- Confirm Password (only when registering) -->
+          <template v-if="!isLogin">
+            <div class="form-group">
+              <label for="confirmPassword">Confirm Password</label>
+              <input id="confirmPassword" v-model="form.confirmPassword" type="password" required />
+            </div>
+          </template>
+
+          <button type="submit" class="auth-submit-btn">{{ isLogin ? 'Login' : 'Register' }}</button>
         </form>
 
         <!-- Success/Error Toast -->
@@ -63,6 +82,7 @@
     </div>
   </div>
 </template>
+S
 
 <script setup>
 import { ref, reactive } from 'vue';
@@ -81,7 +101,8 @@ const form = reactive({
   lastName: '',
   phoneNumber: '',
   emailAddress: '',
-  password: ''
+  password: '',
+  confirmPassword: ''
 });
 
 const handleSubmit = async () => {
@@ -92,16 +113,20 @@ const handleSubmit = async () => {
     if (isLogin.value) {
       // LOGIN
       const loggedInUser = await customerAPI.login(form.emailAddress, form.password);
-
       userStore.setUser(loggedInUser);
       localStorage.setItem('user', JSON.stringify(loggedInUser));
 
       successMessage.value = `Welcome back, ${loggedInUser.firstName}!`;
       submitted.value = true;
-
       setTimeout(() => router.push('/'), 1200);
     } else {
       // REGISTRATION
+      if (form.password !== form.confirmPassword) {
+        successMessage.value = "Passwords do not match.";
+        submitted.value = true;
+        return;
+      }
+
       const customerData = {
         firstName: form.firstName,
         lastName: form.lastName,
@@ -110,15 +135,21 @@ const handleSubmit = async () => {
         password: form.password
       };
 
-      const newCustomer = await customerAPI.create(customerData);
+      await customerAPI.create(customerData);
 
-      userStore.setUser(newCustomer);
-      localStorage.setItem('user', JSON.stringify(newCustomer));
-
-      successMessage.value = `Thank you for joining, ${newCustomer.firstName}!`;
+      successMessage.value = `Registration successful. Please log in using your email and password.`;
       submitted.value = true;
 
-      setTimeout(() => router.push('/customer/profile'), 1200);
+      // Reset form (optional)
+      form.firstName = '';
+      form.lastName = '';
+      form.phoneNumber = '';
+      form.emailAddress = '';
+      form.password = '';
+      form.confirmPassword = '';
+
+      // Redirect to login
+      isLogin.value = true;
     }
   } catch (error) {
     console.error("Error:", error.response?.data || error.message);
@@ -127,6 +158,7 @@ const handleSubmit = async () => {
   }
 };
 </script>
+
 
 <style scoped>
 :root {
@@ -187,7 +219,7 @@ const handleSubmit = async () => {
 label { font-size:0.8rem; margin-bottom:0.2rem; }
 input, select { padding:0.6rem; font-size:0.85rem; border-radius:6px; border:1px solid #ddd; }
 
-.submit-btn {
+.auth-submit-btn {
   padding:0.8rem;
   font-size:0.95rem;
   border-radius:10px;
@@ -198,7 +230,10 @@ input, select { padding:0.6rem; font-size:0.85rem; border-radius:6px; border:1px
   cursor:pointer;
   transition: all 0.3s;
 }
-.submit-btn:hover { background: var(--taupe); transform: translateY(-1px); }
+
+.auth-submit-btn:hover { 
+  transform: translateY(-1px); 
+}
 
 .success-toast {
   position: fixed;

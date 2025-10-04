@@ -48,26 +48,48 @@
 
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '@/store/userStore';
+import { storeToRefs } from 'pinia';
+
 import customerAPI from '@/api/users/customerService.js';
 import ProfileHeader from '@/components/users/ProfileHeader.vue';
 import AddressForm from '@/components/generic/AddressForm.vue';
 import addressAPI from '@/api/generic/addressService.js';
 
 const router = useRouter();
-const user = ref({});
-const loading = ref(true);
 
+const userStore = useUserStore();
+const { user } = storeToRefs(userStore); // reactive
+
+const loading = ref(true);
 const addresses = ref([]);
 const selectedAddress = ref(null);
 const showAddressForm = ref(false);
 const loadingAddresses = ref(false);
 
+// 🔁 Load user and their addresses
+const fetchUser = async () => {
+  if (!user.value || !user.value.id) {
+    router.push('/auth'); // redirect to login if no user
+    return;
+  }
+
+  try {
+    loading.value = true;
+    const data = await customerAPI.getById(user.value.id);
+    user.value = data; // update pinia user with fresh data
+    await fetchAddresses(data.id);
+  } catch (err) {
+    console.error("❌ Error fetching profile:", err);
+  } finally {
+    loading.value = false;
+  }
+};
+
 const fetchAddresses = async (customerId) => {
   loadingAddresses.value = true;
-  addresses.value = [];
-
   try {
     const result = await addressAPI.findByCustomerId(customerId);
     addresses.value = Array.isArray(result) ? result : [result];
@@ -78,24 +100,7 @@ const fetchAddresses = async (customerId) => {
   }
 };
 
-const fetchUser = async () => {
-  try {
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-      router.push('/');
-      return;
-    }
-
-    const data = await customerAPI.getById(userId);
-    user.value = data;
-    await fetchAddresses(data.id);
-  } catch (err) {
-    console.error("❌ Error fetching profile:", err);
-  } finally {
-    loading.value = false;
-  }
-};
-
+// Profile Actions
 const updateProfile = async (updatedUser) => {
   try {
     updatedUser.id = user.value.id;
@@ -114,7 +119,7 @@ const deleteProfile = async () => {
 
   try {
     await customerAPI.delete(user.value.id);
-    localStorage.removeItem('userId');
+    userStore.logout();
     alert("✅ Profile deleted successfully!");
     router.push('/');
   } catch (err) {
@@ -123,6 +128,7 @@ const deleteProfile = async () => {
   }
 };
 
+// Address Form
 const openAddAddressForm = () => {
   selectedAddress.value = {
     street: '',
@@ -156,8 +162,12 @@ const cancelAddressForm = () => {
   showAddressForm.value = false;
 };
 
-onMounted(fetchUser);
+onMounted(() => {
+  if (!user.value) userStore.initialize(); // initialize from localStorage if needed
+  fetchUser();
+});
 </script>
+
 
 <style scoped>
 :root {
