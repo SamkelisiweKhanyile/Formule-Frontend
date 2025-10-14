@@ -89,7 +89,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useUserStore } from '@/store/userStore.js';
 import { useRouter } from 'vue-router';
-import cartAPI from '@/api/business/CartService.js';
+import cartAPI from '@/api/customer/cartService.js';
 import AddressForm from '@/components/generic/AddressForm.vue';
 
 const userStore = useUserStore();

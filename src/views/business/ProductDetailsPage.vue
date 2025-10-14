@@ -1,7 +1,3 @@
-// Details of the chosen product
-// Display image, name, description & price
-// Optional (Alloe user to select quantity)
-// Add an "add to cart" button (it should carry the necessary details of the product to be sent to CART)
 
 <template>
   <div class="product-details">
@@ -27,7 +23,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import productAPI from '@/api/business/ProductService.js'
+import productAPI from '@/api/customer/productService.js'
 
 const route = useRoute()
 const product = ref(null)

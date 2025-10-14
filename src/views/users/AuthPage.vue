@@ -87,7 +87,7 @@ S
 <script setup>
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import customerAPI from '@/api/users/CustomerService.js';
+import customerAPI from '@/api/customer/customerService.js';
 import { useUserStore } from '@/store/userStore.js'; 
 
 const isLogin = ref(true);

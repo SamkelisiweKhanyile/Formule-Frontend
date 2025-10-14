@@ -15,17 +15,6 @@ const customerAPI = {
     }
   },
 
-  
-  getAll: async () => {
-    try {
-      const response = await axios.get(`${apiUrl}/getAll`);
-      return response.data; 
-    } catch (error) {
-      console.error("Error fetching customers:", error.response ? error.response.data : error.message);
-      throw error;
-    }
-  },
-
   getById: async (id) => {
     try {
       const response = await axios.get(`${apiUrl}/read/${id}`);
@@ -57,20 +46,6 @@ const customerAPI = {
       throw error;
     }
   },
-
-  login: async (email, password) => {
-  try {
-    const response = await axios.post(`${apiUrl}/login`, {
-      email: email,
-      password: password
-    });
-    return response.data;
-  } catch (error) {
-    console.error("❌ Login failed:", error.response?.data || error.message);
-    throw error;
-  }
-},
-
   
 };
 

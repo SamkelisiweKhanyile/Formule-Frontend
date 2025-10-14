@@ -56,19 +56,6 @@ const adminAPI = {
       throw error;
     }
   },
-
-  login: async (email, password) => {
-    try {
-      const response = await axios.post(`${apiUrl}/login`, {
-        email: email,
-        password: password
-      });
-      return response.data;
-    } catch (error) {
-      console.error("❌ Login failed:", error.response?.data || error.message);
-      throw error;
-    }
-
   
 };
 

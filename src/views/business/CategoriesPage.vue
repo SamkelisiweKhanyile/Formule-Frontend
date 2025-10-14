@@ -44,7 +44,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import CategoryService from '@/api/business/CategoryService'
+import CategoryAPI from '@/api/customer/categoryService'
 
 const categories = ref([])
 const products = ref([])
@@ -65,7 +65,7 @@ function getImageUrl(url) {
 
 const fetchCategories = async () => {
   try {
-    const response = await CategoryService.getAllCategories()
+    const response = await CategoryAPI.getAllCategories()
     categories.value = response.data
     if (categories.value.length > 0) {
       fetchProducts(categories.value[0].id)
@@ -78,7 +78,7 @@ const fetchCategories = async () => {
 const fetchProducts = async (categoryId) => {
   try {
     selectedCategoryId.value = categoryId
-    const response = await CategoryService.getProductsByCategory(categoryId)
+    const response = await CategoryAPI.getProductsByCategory(categoryId)
 
     // ✅ Map backend field to imageUrl for frontend
     products.value = response.data.map(prod => ({
