@@ -5,7 +5,7 @@ const baseUrl = '/product';
 const productAPI = {
   getAll: async () => {
     try {
-      const response = await axios.get(`${baseUrl}/getall`);
+      const response = await axios.get(`${baseUrl}/getAll`);
       return response.data;
     } catch (error) {
       console.error("Error fetching products:", error.response?.data || error.message);

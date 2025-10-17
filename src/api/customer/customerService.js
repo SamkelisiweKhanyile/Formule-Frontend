@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios from '@/api/axiosInstance';
 
-const apiUrl = 'http://localhost:8080/customer';
+const apiUrl = '/customer';
 
 const customerAPI = {
 

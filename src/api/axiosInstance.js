@@ -2,7 +2,9 @@ import axios from 'axios'
 
 // 1️⃣ Create the Axios instance with base URL
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080/formule', // change if your backend base path differs
+  
+  //baseURL: 'http://localhost:8080/formule
+  baseURL: 'https://organic-couscous-pqgx46pg957f65v5-8080.app.github.dev/formule', // change if your backend base path differs
   timeout: 10000, // optional: 10 seconds timeout
 })
 
