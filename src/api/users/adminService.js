@@ -1,26 +1,26 @@
-import axios from 'axios';
+import axios from '@/api/axiosInstance';
 
-const apiUrl = 'http://localhost:8080/admin';
+const apiUrl = '/admin';
+const authUrl = '/auth';
 
 const adminAPI = {
 
   create: async (adminData) => {
     try {
-    
-      const response = await axios.post(`${apiUrl}/create`, adminAPI);
-      return response.data; 
+      const response = await axios.post(`${apiUrl}/create`, adminData);
+      return response.data;
     } catch (error) {
-      console.error("Error creating admn:", error.response ? error.response.data : error.message);
+      console.error("Error creating admin:", error.response ? error.response.data : error.message);
       throw error;
     }
   },
 
-  getAll: async () => {
+  login: async (email, password) => {
     try {
-      const response = await axios.get(`${apiUrl}/getAll`);
-      return response.data; 
+      const response = await axios.post(`${authUrl}/login`, { email, password });
+      return response.data;
     } catch (error) {
-      console.error("Error fetching admin:", error.response ? error.response.data : error.message);
+      console.error("Error logging in as admin:", error.response ? error.response.data : error.message);
       throw error;
     }
   },
@@ -28,35 +28,32 @@ const adminAPI = {
   getById: async (id) => {
     try {
       const response = await axios.get(`${apiUrl}/read/${id}`);
-      return response.data; 
+      return response.data;
     } catch (error) {
       console.error("Error fetching admin by ID:", error.response ? error.response.data : error.message);
       throw error;
     }
   },
 
-
-  update: async (id, adminData) => {
+  update: async (adminData) => {
     try {
-      const response = await axios.put(`${apiUrl}/update`, adminData); 
-      return response.data;  
+      const response = await axios.put(`${apiUrl}/update`, adminData);
+      return response.data;
     } catch (error) {
       console.error("Error updating admin:", error.response ? error.response.data : error.message);
       throw error;
     }
   },
 
-
   delete: async (id) => {
     try {
       const response = await axios.delete(`${apiUrl}/delete/${id}`);
-      return response.data;  
+      return response.data;
     } catch (error) {
       console.error("Error deleting admin:", error.response ? error.response.data : error.message);
       throw error;
     }
   },
-  
 };
 
 export default adminAPI;
