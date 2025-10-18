@@ -6,7 +6,6 @@ const customerAPI = {
 
   create: async (customerData) => {
     try {
-    
       const response = await axios.post(`${apiUrl}/create`, customerData);
       return response.data; 
     } catch (error) {

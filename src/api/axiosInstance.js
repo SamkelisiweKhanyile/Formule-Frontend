@@ -1,36 +1,39 @@
-import axios from 'axios'
+import axios from 'axios';
+import { useUserStore } from '@/store/userStore.js';
+import router from '@/router'; // make sure your router is exported
 
-// 1️⃣ Create the Axios instance with base URL
 const axiosInstance = axios.create({
-  
-  //baseURL: 'http://localhost:8080/formule
-  baseURL: 'https://organic-couscous-pqgx46pg957f65v5-8080.app.github.dev/formule', // change if your backend base path differs
-  timeout: 10000, // optional: 10 seconds timeout
-})
+  // Change baseURL to your backend
+  // baseURL: 'https://localhost:8080/formule', 
+  baseURL: 'https://organic-couscous-pqgx46pg957f65v5-8080.app.github.dev/formule',
+  timeout: 10000, // 10 seconds
+});
 
-// 2️⃣ Automatically attach the token to every request
+// Attach token to every request
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token') // assumes you save JWT here
+    const userStore = useUserStore();
+    const token = userStore.token || localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return config
+    return config;
   },
   (error) => Promise.reject(error)
-)
+);
 
-// 3️⃣ Optional: handle responses globally (like logging out if 401)
+// Handle 401 Unauthorized globally
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // maybe redirect to login
-      console.warn('Unauthorized! Redirecting to login...')
-      // window.location.href = '/auth'  // uncomment if you want auto redirect
+      console.warn('Unauthorized! Logging out...');
+      const userStore = useUserStore();
+      userStore.logout();
+      router.push('/login'); // redirect to login
     }
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
 
-export default axiosInstance
+export default axiosInstance;

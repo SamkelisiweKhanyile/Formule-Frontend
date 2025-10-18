@@ -1,16 +1,26 @@
 import axios from '@/api/axiosInstance';
 
 const apiUrl = '/customer';
+const authUrl = '/auth'; 
 
 const customerAPI = {
 
   create: async (customerData) => {
     try {
-    
       const response = await axios.post(`${apiUrl}/create`, customerData);
       return response.data; 
     } catch (error) {
       console.error("Error creating customer:", error.response ? error.response.data : error.message);
+      throw error;
+    }
+  },
+
+  login: async (email, password) => {
+    try {
+      const response = await axios.post(`${authUrl}/login`, { email, password });
+      return response.data; 
+    } catch (error) {
+      console.error("Error logging in:", error.response ? error.response.data : error.message);
       throw error;
     }
   },
@@ -25,7 +35,6 @@ const customerAPI = {
     }
   },
 
-
   update: async (id, customerData) => {
     try {
       const response = await axios.put(`${apiUrl}/update`, customerData); 
@@ -35,7 +44,6 @@ const customerAPI = {
       throw error;
     }
   },
-
 
   delete: async (id) => {
     try {
