@@ -1,7 +1,3 @@
-// Create heading "Shop By Category"
-// & create buttons for different cartegories (Toners, Serums, etc)
-// When a category is selected, display products in that category
-// When a product is selected, redirect user to (ProductDetailsPage.vue) with the neccesarry data
 
 <template>
   <div class="category-page">
@@ -44,7 +40,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import CategoryAPI from '@/api/customer/categoryService'
+import CategoryAPI from '@/api/business/categoryService'
 
 const categories = ref([])
 const products = ref([])

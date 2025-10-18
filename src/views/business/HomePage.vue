@@ -84,8 +84,8 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { useUserStore } from '@/store/userStore.js';
-import productAPI from '@/api/customer/productService.js';
-import cartAPI from '@/api/customer/cartService.js';
+import productAPI from '@/api/business/productService.js';
+import cartAPI from '@/api/business/cartService.js';
 import ProductCard from '@/components/business/ProductCard.vue';
 
 const products = ref([]);

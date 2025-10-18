@@ -33,7 +33,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import CategoryAPI from '@/api/customer/categoryService'
+import CategoryAPI from '@/api/business/categoryService'
 
 const categories = ref([])
 const products = ref([])

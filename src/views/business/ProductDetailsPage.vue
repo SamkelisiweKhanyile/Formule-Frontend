@@ -23,7 +23,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import productAPI from '@/api/customer/productService.js'
+import productAPI from '@/api/business/productService.js'
 
 const route = useRoute()
 const product = ref(null)
